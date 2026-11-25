@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Docker Notes App</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 16px; }
+    form { display: flex; gap: 8px; margin-bottom: 20px; }
+    input { flex: 1; padding: 10px; font-size: 16px; }
+    button { padding: 10px 16px; font-size: 16px; cursor: pointer; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Docker Full-Stack Notes</h1>
+  <form id="note-form">
+    <input id="note-input" type="text" placeholder="Write a note..." required />
+    <button type="submit">Save</button>
+  </form>
+  <ul id="notes-list"></ul>
+
+  <script>
+    const API_BASE = 'http://localhost:4000';
+
+    async function loadNotes() {
+      const res = await fetch(`${API_BASE}/api/notes`);
+      const notes = await res.json();
+      const list = document.getElementById('notes-list');
+      list.innerHTML = notes.map(n => `<li>${n.text}</li>`).join('');
+    }
+
+    document.getElementById('note-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('note-input');
+      await fetch(`${API_BASE}/api/notes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: input.value })
+      });
+      input.value = '';
+      loadNotes();
+    });
+
+    loadNotes();
+  </script>
+</body>
+</html>
